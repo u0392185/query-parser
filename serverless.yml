@@ -1,0 +1,64 @@
+service: queryparser # NOTE: update this with your service name
+app: queryparser
+tenant: u0392185
+
+iamRoleStatements:
+  - Effect: "Allow"
+    Action:
+      - ses:SendEmail
+      - ses:SendRawEmail
+    Resource: "*"
+
+plugins:
+  - serverless-webpack
+  - serverless-offline
+  - serverless-dotenv-plugin
+
+custom:
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true
+
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  timeout: 30
+  iamRoleStatements:
+  - Effect: "Allow"
+    Action:
+      - "ses:SendEmail"
+    Resource: "*"
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - http:
+          path: /
+          method: get
+          cors: true
+
+  account:
+    handler: handler.accountUsers
+    events:
+      - http:
+          path: /account/{accountId}/
+          method: get
+          cors: true
+
+  users:
+    handler: handler.userInfo
+    events:
+      - http:
+          path: /user/{userId}/
+          method: get
+          cors: true
+
+  email:
+    handler: handler.emailEndpoint
+    events:
+      - http:
+          path: /sendGrid/
+          method: post
+          cors: true
